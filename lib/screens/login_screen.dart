@@ -1,65 +1,49 @@
 import 'package:flutter/material.dart';
+import '../services/api_service.dart';
+import 'register_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  @override
+  _LoginScreenState createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emailController = TextEditingController();
+  final senhaController = TextEditingController();
+  final api = ApiService();
+
+  void login() async {
+    final user = await api.loginUser(emailController.text, senhaController.text);
+    if (user != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Bem-vindo ${user['nome']}")),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Login inválido")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage("assets/background_login.png"),
-            fit: BoxFit.cover,
-          ),
-        ),
-        child: Center(
-          child: SingleChildScrollView(
-            padding: EdgeInsets.all(24),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("LOGIN",
-                    style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white)),
-                SizedBox(height: 30),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: "E-MAIL",
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.8),
-                  ),
-                ),
-                SizedBox(height: 16),
-                TextField(
-                  obscureText: true,
-                  decoration: InputDecoration(
-                    labelText: "SENHA",
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.8),
-                  ),
-                ),
-                SizedBox(height: 24),
-                ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFDD742E),
-                    padding: EdgeInsets.symmetric(horizontal: 80, vertical: 14),
-                  ),
-                  onPressed: () => Navigator.pushNamed(context, '/cadastro'),
-                  child: Text("ENTRAR",
-                      style: TextStyle(
-                          fontSize: 18, fontWeight: FontWeight.bold)),
-                ),
-                SizedBox(height: 16),
-                TextButton(
-                  onPressed: () {},
-                  child: Text("ESQUECEU A SENHA?",
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ],
-            ),
-          ),
+      appBar: AppBar(title: Text("Login")),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          children: [
+            TextField(controller: emailController, decoration: InputDecoration(labelText: "Email")),
+            TextField(controller: senhaController, decoration: InputDecoration(labelText: "Senha"), obscureText: true),
+            SizedBox(height: 20),
+            ElevatedButton(onPressed: login, child: Text("Entrar")),
+            TextButton(
+              onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (_) => RegisterScreen()));
+              },
+              child: Text("Não tem conta? Cadastre-se"),
+            )
+          ],
         ),
       ),
     );
